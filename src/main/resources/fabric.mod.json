@@ -12,6 +12,7 @@
   "license": "MIT",
   "icon": "assets/ensign/icon.png",
   "environment": "*",
+  "accessWidener": "ensign.accesswidener",
   "entrypoints": {
     "main": ["diacritics.owo.Ensign"],
     "client": ["diacritics.owo.EnsignClient"]
