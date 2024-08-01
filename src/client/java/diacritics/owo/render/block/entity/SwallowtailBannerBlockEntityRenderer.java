@@ -1,6 +1,7 @@
 package diacritics.owo.render.block.entity;
 
 import diacritics.owo.block.SwallowtailBannerBlock;
+import diacritics.owo.block.WallSwallowtailBannerBlock;
 import diacritics.owo.block.entity.SwallowtailBannerBlockEntity;
 import diacritics.owo.render.entity.model.EnsignEntityModelLayers;
 import net.minecraft.block.BlockState;
@@ -22,6 +23,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.RotationPropertyHelper;
@@ -38,6 +40,9 @@ public class SwallowtailBannerBlockEntityRenderer
   private final ModelPart pillar;
   private final ModelPart crossbar;
 
+  public static final int TAIL_HEIGHT = 10;
+  public static final int TAIL_STEP = 2;
+
   public SwallowtailBannerBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
     ModelPart modelPart = ctx.getLayerModelPart(EnsignEntityModelLayers.SWALLOWTAIL_BANNER);
     this.banner = modelPart.getChild("flag");
@@ -48,21 +53,37 @@ public class SwallowtailBannerBlockEntityRenderer
   public static TexturedModelData getTexturedModelData() {
     ModelData modelData = new ModelData();
     ModelPartData modelPartData = modelData.getRoot();
-    modelPartData.addChild(BANNER,
-        ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F, WIDTH, HEIGHT, 1.0F),
-        ModelTransform.NONE);
+
     modelPartData.addChild(PILLAR,
         ModelPartBuilder.create().uv(44, 0).cuboid(-1.0F, -30.0F, -1.0F, 2.0F, 42.0F, 2.0F),
         ModelTransform.NONE);
     modelPartData.addChild(CROSSBAR,
         ModelPartBuilder.create().uv(0, 42).cuboid(-10.0F, -32.0F, -1.0F, WIDTH, 2.0F, 2.0F),
         ModelTransform.NONE);
+
+    ModelPartData banner = modelPartData.addChild(BANNER, ModelPartBuilder.create().uv(0, 0)
+        .cuboid(-10.0F, 0.0F, -2.0F, WIDTH, HEIGHT - TAIL_HEIGHT, 1.0F), ModelTransform.NONE);
+
+    for (int i = 0; i < TAIL_HEIGHT; i += TAIL_STEP) {
+      banner.addChild("ltail" + i,
+          ModelPartBuilder.create().uv(0, HEIGHT - (TAIL_HEIGHT - i)).cuboid(-10.0F,
+              HEIGHT - (TAIL_HEIGHT - i), -2.0F, (WIDTH / 2) - i, TAIL_STEP, 1.0F),
+          ModelTransform.NONE);
+
+      // TODO: the texture on the back of the right tail is messed up
+      banner.addChild("rtail" + i,
+          ModelPartBuilder.create().uv((WIDTH / 2) + i, HEIGHT - (TAIL_HEIGHT - i)).cuboid(
+              -10.0F + ((WIDTH / 2) + i), HEIGHT - (TAIL_HEIGHT - i), -2.0F, (WIDTH / 2) - i,
+              TAIL_STEP, 1.0F),
+          ModelTransform.NONE);
+    }
+
     return TexturedModelData.of(modelData, 64, 64);
   }
 
   public void render(SwallowtailBannerBlockEntity bannerBlockEntity, float f,
       MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j) {
-    // float g = 0.6666667F;
+    float g = 0.6666667F;
     boolean bl = bannerBlockEntity.getWorld() == null;
     matrixStack.push();
     long l;
@@ -80,12 +101,13 @@ public class SwallowtailBannerBlockEntityRenderer
             .toDegrees((Integer) blockState.get(SwallowtailBannerBlock.ROTATION));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
         this.pillar.visible = true;
-      } /*
-         * else { matrixStack.translate(0.5F, -g / 4, 0.5F); h = -((Direction)
-         * blockState.get(WallBannerBlock.FACING)).asRotation();
-         * matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
-         * matrixStack.translate(0.0F, -0.3125F, -0.4375F); this.pillar.visible = false; }
-         */
+      } else {
+        matrixStack.translate(0.5F, -g / 4, 0.5F);
+        h = -((Direction) blockState.get(WallSwallowtailBannerBlock.FACING)).asRotation();
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
+        matrixStack.translate(0.0F, -0.3125F, -0.4375F);
+        this.pillar.visible = false;
+      }
       // TODO: wallswallowtailbannerblock
     }
 

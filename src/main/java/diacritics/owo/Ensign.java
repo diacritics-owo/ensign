@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import diacritics.owo.block.EnsignBlocks;
 import diacritics.owo.block.entity.EnsignBlockEntities;
+import diacritics.owo.item.EnsignItems;
 
 public class Ensign implements ModInitializer {
 	public static final String MOD_ID = "ensign";
@@ -17,6 +18,7 @@ public class Ensign implements ModInitializer {
 
 		EnsignBlocks.initialize();
 		EnsignBlockEntities.initialize();
+		EnsignItems.initialize();
 	}
 
 	public static Identifier identifier(String path) {

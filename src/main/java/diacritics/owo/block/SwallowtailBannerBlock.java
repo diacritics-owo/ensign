@@ -94,7 +94,7 @@ public class SwallowtailBannerBlock extends AbstractBannerBlock {
 
   public static Block getForColor(DyeColor color) {
     return (Block) COLORED_SWALLOWTAIL_BANNERS.getOrDefault(color,
-        EnsignBlocks.WHITE_SWALLOWTAIL_BANNER.block());
+        EnsignBlocks.WHITE_SWALLOWTAIL_BANNER);
   }
 
   // other methods from abstractbannerblock not overriden by bannerblock that we need to override
