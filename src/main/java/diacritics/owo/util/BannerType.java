@@ -17,6 +17,7 @@ public enum BannerType implements StringIdentifiable {
 
   private static final IntFunction<BannerType> BY_ID = ValueLists
       .createIdToValueFunction(BannerType::getId, values(), ValueLists.OutOfBoundsHandling.ZERO);
+  @SuppressWarnings("deprecation")
   public static final StringIdentifiable.EnumCodec<BannerType> CODEC =
       StringIdentifiable.createCodec(BannerType::values);
   public static final PacketCodec<ByteBuf, BannerType> PACKET_CODEC =
@@ -48,6 +49,7 @@ public enum BannerType implements StringIdentifiable {
 
   @Nullable
   public static BannerType byName(String name, @Nullable BannerType defaultType) {
+    @SuppressWarnings("deprecation")
     BannerType dyeColor = (BannerType) CODEC.byId(name);
     return dyeColor != null ? dyeColor : defaultType;
   }

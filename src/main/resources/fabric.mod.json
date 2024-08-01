@@ -3,7 +3,7 @@
   "id": "ensign",
   "version": "${version}",
   "name": "Ensign",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Improvements and additions for banners",
   "authors": ["diacritics-owo"],
   "contact": {
     "homepage": "https://fabricmc.net/",
