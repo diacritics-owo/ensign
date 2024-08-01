@@ -59,7 +59,7 @@ public class SwallowtailBannerBlockEntity extends BlockEntity implements Nameabl
   protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
     super.writeNbt(nbt, registryLookup);
     if (!this.patterns.equals(BannerPatternsComponent.DEFAULT)) {
-      nbt.put("patterns", BannerPatternsComponent.CODEC
+      nbt.put(PATTERNS_KEY, BannerPatternsComponent.CODEC
           .encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.patterns).getOrThrow());
     }
 
@@ -75,9 +75,9 @@ public class SwallowtailBannerBlockEntity extends BlockEntity implements Nameabl
       this.customName = tryParseCustomName(nbt.getString("CustomName"), registryLookup);
     }
 
-    if (nbt.contains("patterns")) {
+    if (nbt.contains(PATTERNS_KEY)) {
       BannerPatternsComponent.CODEC
-          .parse(registryLookup.getOps(NbtOps.INSTANCE), nbt.get("patterns"))
+          .parse(registryLookup.getOps(NbtOps.INSTANCE), nbt.get(PATTERNS_KEY))
           .resultOrPartial(
               patterns -> Ensign.LOGGER.error("Failed to parse banner patterns: '{}'", patterns))
           .ifPresent(patterns -> this.patterns = patterns);
@@ -124,7 +124,7 @@ public class SwallowtailBannerBlockEntity extends BlockEntity implements Nameabl
 
   @Override
   public void removeFromCopiedStackNbt(NbtCompound nbt) {
-    nbt.remove("patterns");
+    nbt.remove(PATTERNS_KEY);
     nbt.remove("CustomName");
   }
 }
