@@ -27,8 +27,8 @@ import net.minecraft.util.math.RotationPropertyHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import diacritics.owo.util.BannerType;
-import diacritics.owo.util.BannerTypeProvider;
+import diacritics.owo.block.entity.BannerType;
+import diacritics.owo.block.entity.BannerTypeProvider;
 
 @Mixin(BannerBlockEntityRenderer.class)
 public class BannerBlockEntityRendererMixin {
@@ -107,32 +107,21 @@ public class BannerBlockEntityRendererMixin {
 	@Overwrite
 	public void render(BannerBlockEntity bannerBlockEntity, float f, MatrixStack matrixStack,
 			VertexConsumerProvider vertexConsumerProvider, int i, int j) {
-		this.banner.getChild("regular").visible = false;
+		BannerType bannerType = ((BannerTypeProvider) bannerBlockEntity).getBannerType().type().value();
+		String type = bannerType.identifier().getPath();
 
-		this.banner.getChild("swallowtail").visible = false;
+		// TODO: do this better
+		Boolean regular = type == "regular";
+		Boolean swallowtail = type.endsWith("swallowtail");
+		Boolean tonguedSwallowtail = type == "tongued_swallowtail";
+
+		this.banner.getChild("regular").visible = regular;
+
+		this.banner.getChild("swallowtail").visible = swallowtail;
 		for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP_Y) {
-			this.banner.getChild("swallowtail").getChild("ltail" + k).visible = false;
-			this.banner.getChild("swallowtail").getChild("rtail" + k).visible = false;
-			this.banner.getChild("swallowtail").getChild("tongue" + k).visible = false;
-		}
-
-		BannerType bannerType = ((BannerTypeProvider) bannerBlockEntity).getBannerType();
-		ModelPart banner = switch (bannerType) {
-			case BannerType.REGULAR -> this.banner.getChild("regular");
-			case BannerType.SWALLOWTAIL -> this.banner.getChild("swallowtail");
-			case BannerType.TONGUED_SWALLOWTAIL -> this.banner.getChild("swallowtail");
-		};
-
-		banner.visible = true;
-
-		if (bannerType == BannerType.SWALLOWTAIL || bannerType == BannerType.TONGUED_SWALLOWTAIL) {
-			for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP_Y) {
-				banner.getChild("ltail" + k).visible = true;
-				banner.getChild("rtail" + k).visible = true;
-				if (bannerType == BannerType.TONGUED_SWALLOWTAIL) {
-					banner.getChild("tongue" + k).visible = true;
-				}
-			}
+			this.banner.getChild("swallowtail").getChild("ltail" + k).visible = swallowtail;
+			this.banner.getChild("swallowtail").getChild("rtail" + k).visible = swallowtail;
+			this.banner.getChild("swallowtail").getChild("tongue" + k).visible = tonguedSwallowtail;
 		}
 
 		// begin slightly-modified rendering code

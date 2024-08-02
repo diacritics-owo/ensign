@@ -4,6 +4,7 @@ import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryWrapper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,21 +12,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import diacritics.owo.Ensign;
-import diacritics.owo.util.BannerType;
-import diacritics.owo.util.BannerTypeProvider;
+import diacritics.owo.block.entity.BannerTypeProvider;
+import diacritics.owo.component.type.BannerTypeComponent;
 
 // TODO: /data modify requires leaving and rejoining the world (maybe just reloading the chunk?) to
 // visually take effect when setting the type to regular
 // TODO: type is not kept when dropped
 @Mixin(BannerBlockEntity.class)
 public class BannerBlockEntityMixin implements BannerTypeProvider {
-  private BannerType bannerType = BannerType.DEFAULT;
+  private BannerTypeComponent bannerType = BannerTypeComponent.DEFAULT;
 
-  public void setBannerType(BannerType bannerType) {
+  public void setBannerType(BannerTypeComponent bannerType) {
     this.bannerType = bannerType;
   }
 
-  public BannerType getBannerType() {
+  public BannerTypeComponent getBannerType() {
     return bannerType;
   }
 
@@ -33,25 +34,28 @@ public class BannerBlockEntityMixin implements BannerTypeProvider {
   public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup,
       CallbackInfo info) {
     if (nbt.contains("type")) {
-      BannerType.CODEC.parse(registryLookup.getOps(NbtOps.INSTANCE), nbt.get("type"))
-          .resultOrPartial(
-              patterns -> Ensign.LOGGER.error("Failed to parse banner type: '{}'", patterns))
-          .ifPresent(bannerType -> this.bannerType = bannerType);
+      BannerTypeComponent.CODEC.parse(registryLookup.getOps(NbtOps.INSTANCE), nbt.get("type"))
+          .resultOrPartial((type) -> {
+            Ensign.LOGGER.error("Failed to parse banner type: '{}'", type);
+          }).ifPresent((type) -> {
+            this.bannerType = type;
+          });
     }
   }
 
   @Inject(at = @At("TAIL"), method = "writeNbt")
   public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup,
       CallbackInfo info) {
-    if (!this.bannerType.equals(BannerType.DEFAULT)) {
-      nbt.put("type", BannerType.CODEC
+    if (!this.bannerType.equals(BannerTypeComponent.DEFAULT)) {
+      nbt.put("type", (NbtElement) BannerTypeComponent.CODEC
           .encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.bannerType).getOrThrow());
     }
   }
 
   @Inject(at = @At("TAIL"), method = "readComponents")
   protected void readComponents(BlockEntity.ComponentsAccess components, CallbackInfo info) {
-    this.bannerType = components.getOrDefault(Ensign.BANNER_TYPE, BannerType.DEFAULT);
+    this.bannerType = (BannerTypeComponent) components.getOrDefault(Ensign.BANNER_TYPE,
+        BannerTypeComponent.DEFAULT);
   }
 
   @Inject(at = @At("TAIL"), method = "addComponents")

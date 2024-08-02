@@ -7,19 +7,24 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import diacritics.owo.util.BannerType;
+import diacritics.owo.block.entity.BannerTypes;
+import diacritics.owo.component.type.BannerTypeComponent;
+import diacritics.owo.registry.EnsignRegistries;
 
 public class Ensign implements ModInitializer {
 	public static final String MOD_ID = "ensign";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final ComponentType<BannerType> BANNER_TYPE =
+	public static final ComponentType<BannerTypeComponent> BANNER_TYPE =
 			Registry.register(Registries.DATA_COMPONENT_TYPE, identifier("banner_type"),
-					ComponentType.<BannerType>builder().codec(BannerType.CODEC).build());
+					ComponentType.<BannerTypeComponent>builder().codec(BannerTypeComponent.CODEC).build());
 
 	@Override
 	public void onInitialize() {
 		LOGGER.info("hello from ensign!");
+
+		EnsignRegistries.bootstrap();
+		BannerTypes.initialize();
 	}
 
 	public static Identifier identifier(String path) {
