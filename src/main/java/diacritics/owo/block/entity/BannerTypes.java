@@ -11,6 +11,7 @@ public class BannerTypes {
   public static final BannerType REGULAR = register("regular");
   public static final BannerType SWALLOWTAIL = register("swallowtail");
   public static final BannerType TONGUED_SWALLOWTAIL = register("tongued_swallowtail");
+  public static final BannerType ROUNDED = register("rounded");
 
   public static final BannerType DEFAULT = REGULAR;
 

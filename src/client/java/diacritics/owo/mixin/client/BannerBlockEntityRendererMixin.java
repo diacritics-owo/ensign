@@ -19,6 +19,7 @@ import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.type.BannerPatternsComponent;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -29,15 +30,15 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import diacritics.owo.block.entity.BannerType;
 import diacritics.owo.block.entity.BannerTypeProvider;
+import diacritics.owo.client.render.block.entity.BannerTypeModels;
+import diacritics.owo.registry.EnsignClientRegistries;
+import diacritics.owo.util.ModelParameters;
+import diacritics.owo.util.ModelParameters.SwallowTailParameters;;
 
 @Mixin(BannerBlockEntityRenderer.class)
 public class BannerBlockEntityRendererMixin {
-	private static final int WIDTH = 20;
-	private static final int HEIGHT = 40;
-
-	private static final int SWALLOWTAIL_HEIGHT = 20;
-	private static final int SWALLOWTAIL_STEP_X = 2;
-	private static final int SWALLOWTAIL_STEP_Y = 4;
+	private static final ModelParameters parameters =
+			new ModelParameters(20, 40, new SwallowTailParameters(20, 2, 4));
 
 	private final ModelPart banner;
 	private final ModelPart pillar;
@@ -62,44 +63,20 @@ public class BannerBlockEntityRendererMixin {
 		modelPartData.addChild("pole",
 				ModelPartBuilder.create().uv(44, 0).cuboid(-1.0F, -30.0F, -1.0F, 2.0F, 42.0F, 2.0F),
 				ModelTransform.NONE);
-		modelPartData.addChild("bar",
-				ModelPartBuilder.create().uv(0, 42).cuboid(-10.0F, -32.0F, -1.0F, WIDTH, 2.0F, 2.0F),
-				ModelTransform.NONE);
+		modelPartData.addChild("bar", ModelPartBuilder.create().uv(0, 42).cuboid(-10.0F, -32.0F, -1.0F,
+				parameters.width(), 2.0F, 2.0F), ModelTransform.NONE);
 
 		ModelPartData flag =
 				modelPartData.addChild("flag", ModelPartBuilder.create(), ModelTransform.NONE);
 
-		flag.addChild("regular",
-				ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F, WIDTH, HEIGHT, 1.0F),
-				ModelTransform.NONE);
-
-		ModelPartData swallowtail =
-				flag.addChild("swallowtail", ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F,
-						WIDTH, HEIGHT - SWALLOWTAIL_HEIGHT, 1.0F), ModelTransform.NONE);
-
-		for (int i = 0; i < SWALLOWTAIL_HEIGHT; i += SWALLOWTAIL_STEP_Y) {
-			final int Y = SWALLOWTAIL_HEIGHT - i;
-			final int MIDDLE = WIDTH / 2;
-			final int I_X = SWALLOWTAIL_STEP_X * (i / SWALLOWTAIL_STEP_Y);
-			final int TAIL_WIDTH = MIDDLE - I_X;
-
-			swallowtail.addChild("ltail" + i, ModelPartBuilder.create().uv(0, HEIGHT - Y).cuboid(-10.0F,
-					HEIGHT - Y, -2.0F, TAIL_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F), ModelTransform.NONE);
-
-			// TODO: the textures on the back of the right tail and tongue are messed up
-
-			swallowtail.addChild("rtail" + i, ModelPartBuilder.create().uv(MIDDLE + I_X, HEIGHT - Y)
-					.cuboid(-10.0F + (MIDDLE + I_X), HEIGHT - Y, -2.0F, TAIL_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F),
-					ModelTransform.NONE);
-
-			final int TONGUE_WIDTH =
-					TAIL_WIDTH > (WIDTH / 3.0F) ? (WIDTH - (2 * TAIL_WIDTH)) : TAIL_WIDTH;
-			final int TONGUE_X = MIDDLE - (TONGUE_WIDTH / 2);
-
-			swallowtail.addChild("tongue" + i, ModelPartBuilder.create().uv(TONGUE_X, HEIGHT - Y)
-					.cuboid(-10.0F + TONGUE_X, HEIGHT - Y, -2.0F, TONGUE_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F),
-					ModelTransform.NONE);
-		}
+		BannerTypeModels.initialize();
+		EnsignClientRegistries.BANNER_TYPE_MODEL.forEach((bannerTypeModel) -> {
+			bannerTypeModel.modelPartData()
+					.accept(flag.addChild(bannerTypeModel.identifier().toString(),
+							ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F, parameters.width(),
+									parameters.height() - parameters.swallowtailParameters().height(), 1.0F),
+							ModelTransform.NONE), parameters);
+		});
 
 		return TexturedModelData.of(modelData, 64, 64);
 	}
@@ -108,21 +85,13 @@ public class BannerBlockEntityRendererMixin {
 	public void render(BannerBlockEntity bannerBlockEntity, float f, MatrixStack matrixStack,
 			VertexConsumerProvider vertexConsumerProvider, int i, int j) {
 		BannerType bannerType = ((BannerTypeProvider) bannerBlockEntity).getBannerType().type().value();
-		String type = bannerType.identifier().getPath();
+		Identifier identifier = bannerType.identifier();
 
-		// TODO: do this better
-		Boolean regular = type == "regular";
-		Boolean swallowtail = type.endsWith("swallowtail");
-		Boolean tonguedSwallowtail = type == "tongued_swallowtail";
-
-		this.banner.getChild("regular").visible = regular;
-
-		this.banner.getChild("swallowtail").visible = swallowtail;
-		for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP_Y) {
-			this.banner.getChild("swallowtail").getChild("ltail" + k).visible = swallowtail;
-			this.banner.getChild("swallowtail").getChild("rtail" + k).visible = swallowtail;
-			this.banner.getChild("swallowtail").getChild("tongue" + k).visible = tonguedSwallowtail;
-		}
+		EnsignClientRegistries.BANNER_TYPE_MODEL.forEach((bannerTypeModel) -> {
+			bannerTypeModel.setVisibility().accept(
+					this.banner.getChild(bannerTypeModel.identifier().toString()), parameters,
+					identifier.equals(bannerTypeModel.identifier()));
+		});
 
 		// begin slightly-modified rendering code
 
