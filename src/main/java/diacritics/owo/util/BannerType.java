@@ -11,7 +11,9 @@ import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 
 public enum BannerType implements StringIdentifiable {
-  REGULAR(0, "regular"), SWALLOWTAIL(1, "swallowtail");
+  REGULAR(0, "regular"),
+  SWALLOWTAIL(1, "swallowtail"),
+  TONGUED_SWALLOWTAIL(2, "tongued_swallowtail");
 
   public static final BannerType DEFAULT = REGULAR;
 

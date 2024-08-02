@@ -35,8 +35,9 @@ public class BannerBlockEntityRendererMixin {
 	private static final int WIDTH = 20;
 	private static final int HEIGHT = 40;
 
-	private static final int SWALLOWTAIL_HEIGHT = 10;
-	private static final int SWALLOWTAIL_STEP = 2;
+	private static final int SWALLOWTAIL_HEIGHT = 20;
+	private static final int SWALLOWTAIL_STEP_X = 2;
+	private static final int SWALLOWTAIL_STEP_Y = 4;
 
 	private final ModelPart banner;
 	private final ModelPart pillar;
@@ -76,17 +77,27 @@ public class BannerBlockEntityRendererMixin {
 				flag.addChild("swallowtail", ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F,
 						WIDTH, HEIGHT - SWALLOWTAIL_HEIGHT, 1.0F), ModelTransform.NONE);
 
-		for (int i = 0; i < SWALLOWTAIL_HEIGHT; i += SWALLOWTAIL_STEP) {
-			swallowtail.addChild("ltail" + i,
-					ModelPartBuilder.create().uv(0, HEIGHT - (SWALLOWTAIL_HEIGHT - i)).cuboid(-10.0F,
-							HEIGHT - (SWALLOWTAIL_HEIGHT - i), -2.0F, (WIDTH / 2) - i, SWALLOWTAIL_STEP, 1.0F),
+		for (int i = 0; i < SWALLOWTAIL_HEIGHT; i += SWALLOWTAIL_STEP_Y) {
+			final int Y = SWALLOWTAIL_HEIGHT - i;
+			final int MIDDLE = WIDTH / 2;
+			final int I_X = SWALLOWTAIL_STEP_X * (i / SWALLOWTAIL_STEP_Y);
+			final int TAIL_WIDTH = MIDDLE - I_X;
+
+			swallowtail.addChild("ltail" + i, ModelPartBuilder.create().uv(0, HEIGHT - Y).cuboid(-10.0F,
+					HEIGHT - Y, -2.0F, TAIL_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F), ModelTransform.NONE);
+
+			// TODO: the textures on the back of the right tail and tongue are messed up
+
+			swallowtail.addChild("rtail" + i, ModelPartBuilder.create().uv(MIDDLE + I_X, HEIGHT - Y)
+					.cuboid(-10.0F + (MIDDLE + I_X), HEIGHT - Y, -2.0F, TAIL_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F),
 					ModelTransform.NONE);
 
-			// TODO: the texture on the back of the right tail is messed up
-			swallowtail.addChild("rtail" + i,
-					ModelPartBuilder.create().uv((WIDTH / 2) + i, HEIGHT - (SWALLOWTAIL_HEIGHT - i)).cuboid(
-							-10.0F + ((WIDTH / 2) + i), HEIGHT - (SWALLOWTAIL_HEIGHT - i), -2.0F, (WIDTH / 2) - i,
-							SWALLOWTAIL_STEP, 1.0F),
+			final int TONGUE_WIDTH =
+					TAIL_WIDTH > (WIDTH / 3.0F) ? (WIDTH - (2 * TAIL_WIDTH)) : TAIL_WIDTH;
+			final int TONGUE_X = MIDDLE - (TONGUE_WIDTH / 2);
+
+			swallowtail.addChild("tongue" + i, ModelPartBuilder.create().uv(TONGUE_X, HEIGHT - Y)
+					.cuboid(-10.0F + TONGUE_X, HEIGHT - Y, -2.0F, TONGUE_WIDTH, SWALLOWTAIL_STEP_Y, 1.0F),
 					ModelTransform.NONE);
 		}
 
@@ -99,23 +110,28 @@ public class BannerBlockEntityRendererMixin {
 		this.banner.getChild("regular").visible = false;
 
 		this.banner.getChild("swallowtail").visible = false;
-		for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP) {
+		for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP_Y) {
 			this.banner.getChild("swallowtail").getChild("ltail" + k).visible = false;
 			this.banner.getChild("swallowtail").getChild("rtail" + k).visible = false;
+			this.banner.getChild("swallowtail").getChild("tongue" + k).visible = false;
 		}
 
 		BannerType bannerType = ((BannerTypeProvider) bannerBlockEntity).getBannerType();
 		ModelPart banner = switch (bannerType) {
 			case BannerType.REGULAR -> this.banner.getChild("regular");
 			case BannerType.SWALLOWTAIL -> this.banner.getChild("swallowtail");
+			case BannerType.TONGUED_SWALLOWTAIL -> this.banner.getChild("swallowtail");
 		};
 
 		banner.visible = true;
 
-		if (bannerType == BannerType.SWALLOWTAIL) {
-			for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP) {
+		if (bannerType == BannerType.SWALLOWTAIL || bannerType == BannerType.TONGUED_SWALLOWTAIL) {
+			for (int k = 0; k < SWALLOWTAIL_HEIGHT; k += SWALLOWTAIL_STEP_Y) {
 				banner.getChild("ltail" + k).visible = true;
 				banner.getChild("rtail" + k).visible = true;
+				if (bannerType == BannerType.TONGUED_SWALLOWTAIL) {
+					banner.getChild("tongue" + k).visible = true;
+				}
 			}
 		}
 
