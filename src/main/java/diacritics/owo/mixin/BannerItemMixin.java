@@ -17,7 +17,6 @@ public class BannerItemMixin {
   @Inject(at = @At("HEAD"), method = "appendBannerTooltip")
   // it doesn't like public static methods? setting it to private works though so eh
   private static void appendBannerTooltip(ItemStack stack, List<Text> tooltip, CallbackInfo info) {
-    // TODO: is dark gray better?
     tooltip.add(
         ((BannerTypeComponent) stack.getOrDefault(Ensign.BANNER_TYPE, BannerTypeComponent.DEFAULT))
             .getTooltipText().formatted(Formatting.DARK_AQUA));
