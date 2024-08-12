@@ -71,11 +71,8 @@ public class BannerBlockEntityRendererMixin {
 
 		BannerTypeModels.initialize();
 		EnsignClientRegistries.BANNER_TYPE_MODEL.forEach((bannerTypeModel) -> {
-			bannerTypeModel.modelPartData()
-					.accept(flag.addChild(bannerTypeModel.identifier().toString(),
-							ModelPartBuilder.create().uv(0, 0).cuboid(-10.0F, 0.0F, -2.0F, parameters.width(),
-									parameters.height() - parameters.swallowtailParameters().height(), 1.0F),
-							ModelTransform.NONE), parameters);
+			bannerTypeModel.modelPartData().accept(flag.addChild(bannerTypeModel.identifier().toString(),
+					ModelPartBuilder.create(), ModelTransform.NONE), parameters);
 		});
 
 		return TexturedModelData.of(modelData, 64, 64);

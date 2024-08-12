@@ -21,9 +21,8 @@ public class BannerTypes {
   }
 
   public static BannerType register(String name) {
-    // TODO: translation key
     return Registry.register(EnsignRegistries.BANNER_TYPE, Ensign.identifier(name),
-        new BannerType(Ensign.identifier(name), "banner_type.ensign." + name));
+        new BannerType(Ensign.identifier(name), "banner.type." + name));
   }
 }
 

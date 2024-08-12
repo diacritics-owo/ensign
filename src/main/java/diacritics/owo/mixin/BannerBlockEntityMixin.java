@@ -15,8 +15,6 @@ import diacritics.owo.Ensign;
 import diacritics.owo.block.entity.BannerTypeProvider;
 import diacritics.owo.component.type.BannerTypeComponent;
 
-// TODO: /data modify requires leaving and rejoining the world (maybe just reloading the chunk?) to
-// visually take effect when setting the type to regular
 @Mixin(BannerBlockEntity.class)
 public class BannerBlockEntityMixin implements BannerTypeProvider {
   private BannerTypeComponent bannerType = BannerTypeComponent.DEFAULT;
