@@ -38,8 +38,8 @@ public record BannerTypeComponent(RegistryEntry<BannerType> type) {
 
   static {
     CODEC = Identifier.CODEC.xmap(BannerTypeComponent::new, (component) -> {
-      BannerType type = component.type.value();
-      return (type == null ? BannerTypeComponent.DEFAULT.type.value() : type).identifier();
+      return (component == null ? BannerTypeComponent.DEFAULT : component).type.value()
+          .identifier();
     });
     PACKET_CODEC = PacketCodec.tuple(BannerType.ENTRY_PACKET_CODEC, BannerTypeComponent::type,
         BannerTypeComponent::new);

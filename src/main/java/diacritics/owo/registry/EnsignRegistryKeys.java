@@ -1,5 +1,6 @@
 package diacritics.owo.registry;
 
+import diacritics.owo.Ensign;
 import diacritics.owo.block.entity.BannerType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -12,7 +13,7 @@ public class EnsignRegistryKeys {
   public EnsignRegistryKeys() {}
 
   private static <T> RegistryKey<Registry<T>> of(String id) {
-    return RegistryKey.ofRegistry(Identifier.ofVanilla(id));
+    return RegistryKey.ofRegistry(Ensign.identifier(id));
   }
 
   public static String getPath(RegistryKey<? extends Registry<?>> registryRef) {

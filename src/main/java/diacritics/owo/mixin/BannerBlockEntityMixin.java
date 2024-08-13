@@ -43,10 +43,8 @@ public class BannerBlockEntityMixin implements BannerTypeProvider {
   @Inject(at = @At("TAIL"), method = "writeNbt")
   public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup,
       CallbackInfo info) {
-    if (!this.bannerType.equals(BannerTypeComponent.DEFAULT)) {
-      nbt.put("type", (NbtElement) BannerTypeComponent.CODEC
-          .encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.bannerType).getOrThrow());
-    }
+    nbt.put("type", (NbtElement) BannerTypeComponent.CODEC
+        .encodeStart(registryLookup.getOps(NbtOps.INSTANCE), this.bannerType).getOrThrow());
   }
 
   @Inject(at = @At("TAIL"), method = "readComponents")
