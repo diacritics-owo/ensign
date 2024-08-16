@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "ensign:regular",
+    "ensign:swallowtail",
+    "ensign:tongued_swallowtail",
+    "ensign:rounded"
+  ]
+}

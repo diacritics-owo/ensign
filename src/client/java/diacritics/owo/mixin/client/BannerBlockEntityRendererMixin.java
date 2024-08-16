@@ -6,9 +6,6 @@ import net.minecraft.block.WallBannerBlock;
 import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.ModelPartBuilder;
-import net.minecraft.client.model.ModelPartData;
-import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -28,19 +25,14 @@ import net.minecraft.util.math.RotationPropertyHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import diacritics.owo.block.entity.BannerType;
 import diacritics.owo.block.entity.BannerTypeProvider;
-import diacritics.owo.client.render.block.entity.BannerTypeModels;
-import diacritics.owo.registry.EnsignClientRegistries;
-import diacritics.owo.util.ModelParameters;
-import diacritics.owo.util.ModelParameters.SwallowTailParameters;;
+import diacritics.owo.resource.EnsignClientResources;
 
 @Mixin(BannerBlockEntityRenderer.class)
 public class BannerBlockEntityRendererMixin {
-	private static final ModelParameters parameters =
-			new ModelParameters(20, 40, new SwallowTailParameters(20, 2, 4));
+	private static final ModelPart EMPTY_MODEL =
+			TexturedModelData.of(new ModelData(), 64, 64).createModel();
 
-	private final ModelPart banner;
 	private final ModelPart pillar;
 	private final ModelPart crossbar;
 
@@ -50,45 +42,17 @@ public class BannerBlockEntityRendererMixin {
 			DyeColor color, BannerPatternsComponent patterns) {}
 
 	public BannerBlockEntityRendererMixin() {
-		this.banner = null;
 		this.pillar = null;
 		this.crossbar = null;
 	}
 
 	@Overwrite
-	public static TexturedModelData getTexturedModelData() {
-		ModelData modelData = new ModelData();
-		ModelPartData modelPartData = modelData.getRoot();
-
-		modelPartData.addChild("pole",
-				ModelPartBuilder.create().uv(44, 0).cuboid(-1.0F, -30.0F, -1.0F, 2.0F, 42.0F, 2.0F),
-				ModelTransform.NONE);
-		modelPartData.addChild("bar", ModelPartBuilder.create().uv(0, 42).cuboid(-10.0F, -32.0F, -1.0F,
-				parameters.width(), 2.0F, 2.0F), ModelTransform.NONE);
-
-		ModelPartData flag =
-				modelPartData.addChild("flag", ModelPartBuilder.create(), ModelTransform.NONE);
-
-		BannerTypeModels.initialize();
-		EnsignClientRegistries.BANNER_TYPE_MODEL.forEach((bannerTypeModel) -> {
-			bannerTypeModel.modelPartData().accept(flag.addChild(bannerTypeModel.identifier().toString(),
-					ModelPartBuilder.create(), ModelTransform.NONE), parameters);
-		});
-
-		return TexturedModelData.of(modelData, 64, 64);
-	}
-
-	@Overwrite
 	public void render(BannerBlockEntity bannerBlockEntity, float f, MatrixStack matrixStack,
 			VertexConsumerProvider vertexConsumerProvider, int i, int j) {
-		BannerType bannerType = ((BannerTypeProvider) bannerBlockEntity).getBannerType().type().value();
-		Identifier identifier = bannerType.identifier();
+		Identifier identifier = ((BannerTypeProvider) bannerBlockEntity).getBannerType().type();
 
-		EnsignClientRegistries.BANNER_TYPE_MODEL.forEach((bannerTypeModel) -> {
-			bannerTypeModel.setVisibility().accept(
-					this.banner.getChild(bannerTypeModel.identifier().toString()), parameters,
-					identifier.equals(bannerTypeModel.identifier()));
-		});
+		ModelPart banner = EnsignClientResources.BANNER_SHAPES.get(identifier) == null ? EMPTY_MODEL
+				: EnsignClientResources.BANNER_SHAPES.get(identifier).createModel();
 
 		// begin slightly-modified rendering code
 
@@ -119,7 +83,7 @@ public class BannerBlockEntityRendererMixin {
 		}
 
 		matrixStack.push();
-		matrixStack.scale(0.6666667F, -0.6666667F, -0.6666667F);
+		matrixStack.scale(g, -g, -g);
 		VertexConsumer vertexConsumer = ModelLoader.BANNER_BASE
 				.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntitySolid);
 		this.pillar.render(matrixStack, vertexConsumer, i, j);

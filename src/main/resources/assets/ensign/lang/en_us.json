@@ -1,6 +1,6 @@
 {
-  "banner.type.regular": "Regular",
-  "banner.type.swallowtail": "Swallowtail",
-  "banner.type.tongued_swallowtail": "Tongued Swallowtail",
-  "banner.type.rounded": "Rounded"
+  "banner.shape.ensign.regular": "Regular",
+  "banner.shape.ensign.swallowtail": "Swallowtail",
+  "banner.shape.ensign.tongued_swallowtail": "Tongued Swallowtail",
+  "banner.shape.ensign.rounded": "Rounded"
 }

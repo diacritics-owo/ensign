@@ -1,15 +1,16 @@
 package diacritics.owo;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import diacritics.owo.block.entity.BannerTypes;
 import diacritics.owo.component.type.BannerTypeComponent;
-import diacritics.owo.registry.EnsignRegistries;
+import diacritics.owo.resource.EnsignResources;
 
 public class Ensign implements ModInitializer {
 	public static final String MOD_ID = "ensign";
@@ -23,8 +24,8 @@ public class Ensign implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("hello from ensign!");
 
-		EnsignRegistries.bootstrap();
-		BannerTypes.initialize();
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA)
+				.registerReloadListener(new EnsignResources());
 	}
 
 	public static Identifier identifier(String path) {

@@ -13,12 +13,10 @@ import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import java.util.Iterator;
 import org.spongepowered.asm.mixin.Mixin;
-import diacritics.owo.block.entity.BannerType;
 import diacritics.owo.block.entity.BannerTypeProvider;
 import diacritics.owo.component.type.BannerTypeComponent;
-import diacritics.owo.registry.EnsignRegistries;
+import diacritics.owo.resource.EnsignResources;
 
 @Mixin(AbstractBannerBlock.class)
 abstract public class AbstractBannerBlockMixin extends BlockWithEntity {
@@ -33,27 +31,12 @@ abstract public class AbstractBannerBlockMixin extends BlockWithEntity {
       if (!world.isClient) {
         BannerTypeProvider blockEntity = ((BannerTypeProvider) world.getBlockEntity(pos));
 
-        Iterator<BannerType> iterator = EnsignRegistries.BANNER_TYPE.iterator();
-        BannerType first = iterator.next();
-        boolean found =
-            first.identifier().equals(blockEntity.getBannerType().type().value().identifier());
+        // default is 0 (-1 + 1)
+        int index = EnsignResources.BANNER_SHAPES.indexOf(blockEntity.getBannerType().type()) + 1;
 
-        while (iterator.hasNext()) {
-          if (found) {
-            break;
-          }
+        blockEntity.setBannerType(new BannerTypeComponent(EnsignResources.BANNER_SHAPES
+            .get(index > EnsignResources.BANNER_SHAPES.size() - 1 ? 0 : index)));
 
-          BannerType type = iterator.next();
-          if (type.identifier().equals(blockEntity.getBannerType().type().value().identifier())) {
-            found = true;
-          }
-        }
-
-        BannerTypeComponent newType =
-            found ? new BannerTypeComponent(iterator.hasNext() ? iterator.next() : first)
-                : BannerTypeComponent.DEFAULT;
-
-        blockEntity.setBannerType(newType);
         world.markDirty(pos);
         ((ServerWorld) world).getChunkManager().markForUpdate(pos);
       }
