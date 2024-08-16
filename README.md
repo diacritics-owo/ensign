@@ -18,3 +18,7 @@ like vanilla banners and can be dyed in a loom. They retain their shape upon
 breaking.
 
 ![a gif showing how to change the banner shape](images/usage.gif)
+
+## Custom Banner Shapes
+
+Visit the [wiki page](https://github.com/diacritics-owo/ensign/wiki)
