@@ -25,13 +25,13 @@ public class ModelDataDeserializer implements JsonDeserializer<ModelData> {
 
       JsonObject object = cuboids.get(i).getAsJsonObject();
 
-      JsonArray uv = object.getAsJsonArray("uv");
-      builder.uv(uv.get(0).getAsInt(), uv.get(1).getAsInt());
-
       JsonArray offset = object.getAsJsonArray("offset");
       JsonArray size = object.getAsJsonArray("size");
-      builder.cuboid(offset.get(0).getAsFloat(), offset.get(1).getAsFloat(),
-          offset.get(2).getAsFloat(), size.get(0).getAsFloat(), size.get(1).getAsFloat(),
+
+      builder.uv(offset.get(0).getAsInt(), offset.get(1).getAsInt());
+
+      builder.cuboid(offset.get(0).getAsFloat() - 10, offset.get(1).getAsFloat(),
+          offset.get(2).getAsFloat() - 2, size.get(0).getAsFloat(), size.get(1).getAsFloat(),
           size.get(2).getAsFloat());
 
       data.getRoot().addChild(i + "", builder, ModelTransform.NONE);
