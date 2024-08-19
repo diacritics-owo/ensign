@@ -25,6 +25,7 @@ import net.minecraft.util.math.RotationPropertyHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import diacritics.owo.Ensign;
 import diacritics.owo.block.entity.BannerTypeProvider;
 import diacritics.owo.resource.EnsignClientResources;
 
@@ -92,7 +93,11 @@ public class BannerBlockEntityRendererMixin {
 		float k = ((float) Math.floorMod(
 				(long) (blockPos.getX() * 7 + blockPos.getY() * 9 + blockPos.getZ() * 13) + l, 100L) + f)
 				/ 100.0F;
-		banner.pitch = (-0.0125F + 0.01F * MathHelper.cos(6.2831855F * k)) * 3.1415927F;
+
+		if (Ensign.CLIENT_CONFIG.animateBanners()) {
+			banner.pitch = (-0.0125F + 0.01F * MathHelper.cos(6.2831855F * k)) * 3.1415927F;
+		}
+
 		banner.pivotY = -32.0F;
 		renderCanvas(matrixStack, vertexConsumerProvider, i, j, banner, ModelLoader.BANNER_BASE, true,
 				bannerBlockEntity.getColorForState(), bannerBlockEntity.getPatterns());

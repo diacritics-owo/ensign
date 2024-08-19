@@ -15,8 +15,10 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import diacritics.owo.component.type.BannerTypeComponent;
+import diacritics.owo.config.EnsignClientConfig;
 import diacritics.owo.resource.EnsignResources;
 
+@SuppressWarnings("")
 public class Ensign implements ModInitializer {
 	public static final String MOD_ID = "ensign";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -24,6 +26,8 @@ public class Ensign implements ModInitializer {
 	public static final ComponentType<BannerTypeComponent> BANNER_TYPE =
 			Registry.register(Registries.DATA_COMPONENT_TYPE, identifier("banner_type"),
 					ComponentType.<BannerTypeComponent>builder().codec(BannerTypeComponent.CODEC).build());
+
+	public static final EnsignClientConfig CLIENT_CONFIG = EnsignClientConfig.createAndLoad();
 
 	@Override
 	public void onInitialize() {

@@ -11,11 +11,9 @@ base {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+	maven {
+		url 'https://maven.wispforest.io'
+	}
 }
 
 loom {
@@ -39,6 +37,11 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// owo
+	modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+  annotationProcessor "io.wispforest:owo-lib:${project.owo_version}"
+  include "io.wispforest:owo-sentinel:${project.owo_version}"
 }
 
 processResources {
@@ -85,4 +88,12 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+build {
+  doLast {
+		// vscode can't see the file otherwise (it builds fine either way, though)
+		file(layout.buildDirectory.dir('generated/sources/annotationProcessor/java/main/diacritics/owo/config')).mkdirs()
+    file(layout.buildDirectory.dir('generated/sources/annotationProcessor/java/main/EnsignClientConfig.java')).renameTo(file(layout.buildDirectory.dir('generated/sources/annotationProcessor/java/main/diacritics/owo/config/EnsignClientConfig.java')))
+  }
 }
