@@ -8,4 +8,5 @@ import io.wispforest.owo.config.annotation.Modmenu;
 @Config(name = "ensign-client-config", wrapperName = "EnsignClientConfig")
 public class EnsignClientConfigModel {
   public boolean animateBanners = true;
+  public boolean largeBanners = false;
 }
