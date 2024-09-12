@@ -36,7 +36,10 @@ public class BannerBlockEntityRendererMixin {
 	private static final ModelPart EMPTY_MODEL =
 			TexturedModelData.of(new ModelData(), 64, 64).createModel();
 
+	@Shadow
 	private final ModelPart pillar;
+
+	@Shadow
 	private final ModelPart crossbar;
 
 	private final ModelPart shortPillar = ((Supplier<ModelPart>) (() -> {
@@ -80,7 +83,10 @@ public class BannerBlockEntityRendererMixin {
 		if (isItem) {
 			l = 0L;
 			matrixStack.translate(0.5F, 0.5F, 0.5F);
-			pillar.visible = true;
+
+			if (pillar != null) {
+				pillar.visible = true;
+			}
 		} else {
 			l = bannerBlockEntity.getWorld().getTime();
 			BlockState blockState = bannerBlockEntity.getCachedState();
@@ -90,7 +96,9 @@ public class BannerBlockEntityRendererMixin {
 				h = -RotationPropertyHelper.toDegrees((Integer) blockState.get(BannerBlock.ROTATION));
 				matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
 
-				pillar.visible = true;
+				if (pillar != null) {
+					pillar.visible = true;
+				}
 
 				if (Ensign.CLIENT_CONFIG.largeBanners()) {
 					matrixStack.translate(0.0F, -0.1F, 0.0F);
@@ -101,7 +109,9 @@ public class BannerBlockEntityRendererMixin {
 				matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
 				matrixStack.translate(0.0F, -0.3125F, -0.4375F);
 
-				pillar.visible = false;
+				if (pillar != null) {
+					pillar.visible = false;
+				}
 
 				if (Ensign.CLIENT_CONFIG.largeBanners()) {
 					matrixStack.translate(0.0F, -0.1F + 0.0125F, 0.0F);
@@ -115,7 +125,10 @@ public class BannerBlockEntityRendererMixin {
 		VertexConsumer vertexConsumer = ModelLoader.BANNER_BASE
 				.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntitySolid);
 
-		pillar.render(matrixStack, vertexConsumer, i, j);
+		if (pillar != null) {
+			pillar.render(matrixStack, vertexConsumer, i, j);
+		}
+
 		this.crossbar.render(matrixStack, vertexConsumer, i, j);
 
 		BlockPos blockPos = bannerBlockEntity.getPos();
