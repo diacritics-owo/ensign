@@ -31,6 +31,6 @@
     "fabric-api": "*"
   },
   "recommends": {
-    "owo": "0.12.11"
+    "owo": "0.12.15"
   }
 }
